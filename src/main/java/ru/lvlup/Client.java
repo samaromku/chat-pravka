@@ -27,7 +27,7 @@ public class Client {
         return receiver;
     }
 
-    public Client(Socket socket, ClientManager clientManager){
+    public Client(Socket socket, ClientManager clientManager) {
         this.socket = socket;
         this.clientManager = clientManager;
         prepareStreams();
@@ -36,7 +36,7 @@ public class Client {
     /**
      * метод открытия потоков ввода вывода
      */
-    private void prepareStreams(){
+    private void prepareStreams() {
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream());
@@ -48,9 +48,9 @@ public class Client {
     /**
      * авторизация
      */
-    public void login(){
+    public void login() {
         try {
-            while(true) {
+            while (true) {
                 userName = reader.readLine();
                 System.out.println(clientManager.getClients().size());
                 int counter = 0;
@@ -78,18 +78,18 @@ public class Client {
     /**
      * запуск основной работы с клиеном(откр. возм. переписки
      */
-    public void startMessaging(){
+    public void startMessaging() {
         sender = new SendingThread(clientManager);
         sender.start();
 
         try {
-            while(true) {
+            while (true) {
                 String message = reader.readLine();
-                if(message == null){
+                if (message == null) {
                     stopClient();
                     break;
                 }
-                if(message.startsWith("@")){
+                if (message.startsWith("@")) {
                     String[] receivers = message.split("@");
                     receiver = receivers[1];
                     message = receivers[2];
@@ -106,7 +106,7 @@ public class Client {
     /**
      * отключение клиента
      */
-    public void stopClient(){
+    public void stopClient() {
         clientManager.onClientDisconnected(this);
         sender.stopSending();
         try {
@@ -119,18 +119,20 @@ public class Client {
 
     /**
      * событие получ сообщ
+     *
      * @param message - сообщение в необработанном виде
      */
-    public void onMessageReceived(String message){
+    public void onMessageReceived(String message) {
         System.out.println(message);
         sender.addMessage(message);
     }
 
     /**
      * отправка сообщ
+     *
      * @param message - сообщение
      */
-    public void sendMessage(String message){
+    public void sendMessage(String message) {
         writer.println(message);
         writer.flush();
     }

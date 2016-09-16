@@ -18,7 +18,7 @@ public class Message {
         return message;
     }
 
-    public Message(String sender, String receiver, String message){
+    public Message(String sender, String receiver, String message) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;

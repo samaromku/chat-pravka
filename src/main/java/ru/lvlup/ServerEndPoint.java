@@ -12,11 +12,11 @@ public class ServerEndPoint {
     /**
      * создание сокета, прослушка в главном потоке
      */
-    public void startServer(){
+    public void startServer() {
         try {
             serverSocket = new ServerSocket(PORT);
-            while(true){
-                Socket client  = serverSocket.accept();
+            while (true) {
+                Socket client = serverSocket.accept();
                 clientManager.onClientConnected(client);
             }
         } catch (IOException e) {
