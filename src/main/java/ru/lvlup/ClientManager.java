@@ -4,10 +4,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ClientManager {
+    private static final ClientManager instance = new ClientManager();
     private ArrayList<Client> clients = new ArrayList<Client>();
-
-    public ArrayList<Client> getClients() {
-        return clients;
+    private ClientManager(){}
+    public static ClientManager getInstance(){
+        return instance;
     }
 
     /**
@@ -18,7 +19,7 @@ public class ClientManager {
     public void onClientConnected(final Socket socket) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                Client client = new Client(socket, ClientManager.this);
+                Client client = new Client(socket);
                 client.login();
             }
         });
@@ -41,7 +42,10 @@ public class ClientManager {
      * @param client - отключенный клиент
      */
     public void onClientDisconnected(Client client) {
-        clients.remove(client);
+        if(clients.remove(client))
+        {
+            System.out.println("client exit");
+        }
     }
 
     /**
@@ -54,10 +58,18 @@ public class ClientManager {
                 if (client.getUserName().equals(receiver)) {
                     client.sendMessage(message);
                     break;
-                } else if (receiver == null) {
+                } else {
                     client.sendMessage(message);
                 }
         }
     }
-}
 
+    public boolean hasClient(String username) {
+        for (Client c : clients) {
+            if (c.getUserName().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

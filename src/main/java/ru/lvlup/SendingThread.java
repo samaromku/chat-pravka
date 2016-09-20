@@ -6,14 +6,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class SendingThread extends Thread {
-    private ClientManager clientManager;
     private volatile ArrayList<String> queue;
     private boolean alive = true;
     private Gson gson = new Gson();
     private String receiver;
 
-    public SendingThread(ClientManager clientManager) {
-        this.clientManager = clientManager;
+    public SendingThread() {
         queue = new ArrayList<String>();
     }
 
@@ -22,7 +20,7 @@ public class SendingThread extends Thread {
             if (queue.isEmpty()) {
                 Thread.yield();
             } else if (alive) {
-                clientManager.sendMessage(queue.get(0), receiver);
+                ClientManager.getInstance().sendMessage(queue.get(0), receiver);
                 queue.remove(0);
             }
         }

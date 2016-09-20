@@ -7,7 +7,6 @@ import java.net.Socket;
 public class ServerEndPoint {
     private static final int PORT = 8083;
     private ServerSocket serverSocket;
-    private ClientManager clientManager = new ClientManager();
 
     /**
      * создание сокета, прослушка в главном потоке
@@ -17,7 +16,7 @@ public class ServerEndPoint {
             serverSocket = new ServerSocket(PORT);
             while (true) {
                 Socket client = serverSocket.accept();
-                clientManager.onClientConnected(client);
+                ClientManager.getInstance().onClientConnected(client);
             }
         } catch (IOException e) {
             e.printStackTrace();

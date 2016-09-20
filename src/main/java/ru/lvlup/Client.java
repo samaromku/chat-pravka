@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 public class Client {
     private Socket socket;
-    private ClientManager clientManager;
     private BufferedReader reader;
     private PrintWriter writer;
     private SendingThread sender;
@@ -27,9 +26,8 @@ public class Client {
         return receiver;
     }
 
-    public Client(Socket socket, ClientManager clientManager) {
+    public Client(Socket socket) {
         this.socket = socket;
-        this.clientManager = clientManager;
         prepareStreams();
     }
 
@@ -49,37 +47,27 @@ public class Client {
      * авторизация
      */
     public void login() {
-        try {
-            while (true) {
-                userName = reader.readLine();
-                System.out.println(clientManager.getClients().size());
-                int counter = 0;
-                for (int i = 0; i < clientManager.getClients().size(); i++) {
-                    if (clientManager.getClients().get(i).getUserName().equals(userName)) {
-                        counter++;
-                    }
-                }
-                if (counter == 1) {
-                    writer.println("Это имя уже занято. Введите другое имя");
+        while (userName == null) {
+            try {
+                String username = reader.readLine();
+                if (ClientManager.getInstance().hasClient(username)) {
+                    writer.println("Client with same username exists\nTry another username");
                     writer.flush();
-                } else if (counter == 0) {
-                    writer.println("Имя свободно. Чаться, дорогой!");
-                    writer.flush();
-                    break;
+                } else {
+                    this.userName = username;
                 }
-                counter = 0;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            clientManager.onClientSignedIn(Client.this);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        ClientManager.getInstance().onClientSignedIn(this);
     }
 
     /**
      * запуск основной работы с клиеном(откр. возм. переписки
      */
     public void startMessaging() {
-        sender = new SendingThread(clientManager);
+        sender = new SendingThread();
         sender.start();
 
         try {
@@ -107,7 +95,7 @@ public class Client {
      * отключение клиента
      */
     public void stopClient() {
-        clientManager.onClientDisconnected(this);
+        ClientManager.getInstance().onClientDisconnected(this);
         sender.stopSending();
         try {
             writer.close();
